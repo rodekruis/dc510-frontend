@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { withNavigation } from 'react-navigation';
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -15,7 +16,7 @@ class HomeScreen extends React.Component {
   }
 }
 
-export default HomeScreen;
+export default withNavigation(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {
