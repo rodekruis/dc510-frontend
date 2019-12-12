@@ -1,13 +1,21 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <Text>Home screen</Text>
-    </View>
-  );
+class HomeScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Home'
+  };
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text>Home screen</Text>
+      </View>
+    );
+  }
 }
+
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {

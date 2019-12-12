@@ -1,13 +1,21 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function AboutScreen() {
-  return (
-    <View style={styles.container}>
-      <Text>About screen</Text>
-    </View>
-  );
+class AboutScreen extends React.Component {
+  static navigationOptions = {
+    title: 'About'
+  };
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text>About screen</Text>
+      </View>
+    );
+  }
 }
+
+export default AboutScreen;
 
 const styles = StyleSheet.create({
   container: {
