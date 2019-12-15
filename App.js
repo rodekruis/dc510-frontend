@@ -1,8 +1,9 @@
 import React from 'react';
 import { Provider, connect } from 'react-redux';
 import { createReduxContainer } from 'react-navigation-redux-helpers';
+import { PersistGate } from 'redux-persist/integration/react';
 
-import store from './app/store';
+import store, { persistor } from './app/store';
 import AppNavigator from './app/navigator';
 
 const App = createReduxContainer(AppNavigator);
@@ -15,7 +16,9 @@ export default class Root extends React.Component {
   render() {
     return (
       <Provider store={store}>
-        <AppWithNavigationState />
+        <PersistGate loading={null} persistor={persistor}>
+          <AppWithNavigationState />
+        </PersistGate>
       </Provider>
     );
   }
