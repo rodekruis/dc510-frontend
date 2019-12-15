@@ -1,17 +1,22 @@
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import React from 'react';
+import { Provider, connect } from 'react-redux';
+import { createReduxContainer } from 'react-navigation-redux-helpers';
 
-import Home from './app/screens/Home';
-import About from './app/screens/About';
+import store from './app/store';
+import AppNavigator from './app/navigator';
 
-const AppNavigator = createStackNavigator(
-  {
-    Home,
-    About
-  },
-  {
-    initialRouteName: 'Home'
+const App = createReduxContainer(AppNavigator);
+const mapStateToProps = state => ({
+  state: state.nav
+});
+const AppWithNavigationState = connect(mapStateToProps)(App);
+
+export default class Root extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <AppWithNavigationState />
+      </Provider>
+    );
   }
-);
-
-export default createAppContainer(AppNavigator);
+}
