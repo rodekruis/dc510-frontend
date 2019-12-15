@@ -4,7 +4,14 @@ import { ApolloLink } from 'apollo-link';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import store from './store';
 
-const httpLink = createHttpLink({ uri: 'http://localhost:3000/admin/api' });
+const env = {
+  dev: 'http://localhost:3000/admin/api',
+  staging: 'https://dc510-staging.herokuapp.com/admin/api'
+};
+
+const API_ENDPOINT = __DEV__ ? env.dev : env.staging; // eslint-disable-line
+
+const httpLink = createHttpLink({ uri: API_ENDPOINT });
 
 const middlewareLink = new ApolloLink((operation, forward) => {
   const state = store.getState();
