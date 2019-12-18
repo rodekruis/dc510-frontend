@@ -11,7 +11,8 @@ import { authenticate } from '../reducers/user';
 class LoginScreen extends React.Component {
   state = {
     email: '',
-    password: ''
+    password: '',
+    error: null
   };
 
   static navigationOptions = {
@@ -19,31 +20,37 @@ class LoginScreen extends React.Component {
   };
 
   login = async () => {
-    const { data } = await this.props.authenticate({
-      variables: this.state
-    });
-    const { token, user } = data.authenticateUserWithPassword;
-    this.props.dispatch(authenticate({ token, ...user }));
-    this.props.navigation.navigate('App');
+    const { email, password } = this.state;
+    try {
+      const { data } = await this.props.authenticate({
+        variables: { email, password }
+      });
+      if (data.error) throw data.error;
+      const { token, user } = data.authenticateUserWithPassword;
+      this.props.dispatch(authenticate({ token, ...user }));
+      this.props.navigation.navigate('App');
+    } catch (e) {
+      this.setState({ error: 'Incorrect username or password' });
+    }
   };
 
   render() {
+    const { error } = this.state;
     return (
       <View style={styles.container}>
         <Text>Login screen</Text>
+        {error && <Text style={styles.error}>{error}</Text>}
         <TextInput
           placeholder="Email"
           autoCapitalize="none"
           autoCompleteType="email"
-          autoCorrect={false}
-          onChangeText={email => this.setState({ email })}
+          onChangeText={email => this.setState({ email, error: null })}
         />
         <TextInput
           placeholder="Password"
-          autoCapitalize="none"
           autoCompleteType="password"
-          autoCorrect={false}
-          onChangeText={password => this.setState({ password })}
+          secureTextEntry
+          onChangeText={password => this.setState({ password, error: null })}
         />
         <Button title="Login" onPress={this.login} />
       </View>
@@ -82,5 +89,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  error: {
+    color: 'red'
   }
 });
