@@ -2,11 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
 import { withNavigation } from 'react-navigation';
-import { connect } from 'react-redux';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
-import compose from 'lodash.flowright';
-import { authenticate } from '../reducers/user';
+import { gql } from 'apollo-boost';
+import { initialState, AUTHENTICATED_USER } from '../resolvers';
 
 class LoginScreen extends React.Component {
   state = {
@@ -26,27 +24,28 @@ class LoginScreen extends React.Component {
         variables: { email, password }
       });
       if (data.error) throw data.error;
-      const { token, user } = data.authenticateUserWithPassword;
-      this.props.dispatch(authenticate({ token, ...user }));
       this.props.navigation.navigate('App');
     } catch (e) {
+      console.log(e);
       this.setState({ error: 'Incorrect username or password' });
     }
   };
 
   render() {
-    const { error } = this.state;
+    const { error, email, password } = this.state;
     return (
       <View style={styles.container}>
         <Text>Login screen</Text>
         {error && <Text style={styles.error}>{error}</Text>}
         <TextInput
+          defaultValue={email}
           placeholder="Email"
           autoCapitalize="none"
           autoCompleteType="email"
           onChangeText={email => this.setState({ email, error: null })}
         />
         <TextInput
+          defaultValue={password}
           placeholder="Password"
           autoCompleteType="password"
           secureTextEntry
@@ -64,11 +63,11 @@ LoginScreen.propTypes = {
   authenticate: PropTypes.func
 };
 
-const AUTH_MUTATION = gql`
-  mutation AuthenticateUserMutation($email: String!, $password: String!) {
+const AUTHENTICATE_USER = gql`
+  mutation($email: String!, $password: String!) {
     authenticateUserWithPassword(email: $email, password: $password) {
       token
-      user: item {
+      item {
         id
         name
         email
@@ -77,11 +76,26 @@ const AUTH_MUTATION = gql`
   }
 `;
 
-export default connect()(
-  withNavigation(
-    compose(graphql(AUTH_MUTATION, { name: 'authenticate' }))(LoginScreen)
-  )
-);
+export default graphql(AUTHENTICATE_USER, {
+  name: 'authenticate',
+  options: {
+    // Update local state after login
+    update: (
+      proxy,
+      {
+        data: {
+          authenticateUserWithPassword: { token, item }
+        }
+      }
+    ) => {
+      const data = {
+        ...initialState,
+        user: { ...item, token }
+      };
+      proxy.writeQuery({ query: AUTHENTICATED_USER, data });
+    }
+  }
+})(withNavigation(LoginScreen));
 
 const styles = StyleSheet.create({
   container: {
