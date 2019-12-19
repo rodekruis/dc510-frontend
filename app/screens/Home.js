@@ -4,11 +4,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 class HomeScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Home'
-  };
+  static navigationOptions = ({ navigation: { navigate } }) => ({
+    title: 'Home',
+    headerRight: (
+      <HeaderButtons>
+        <Item title="Profile" onPress={() => navigate('Profile')} />
+      </HeaderButtons>
+    )
+  });
 
   render() {
     const {
