@@ -1,22 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { ActivityIndicator, StatusBar, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
+import { graphql } from 'react-apollo';
+import { AUTHENTICATED_USER } from '../resolvers';
 
 class AuthLoadingScreen extends React.Component {
   componentDidMount() {
     this._bootstrapAsync();
   }
 
-  // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
+    const { user } = this.props.data;
     // This will switch to the App screen or Auth screen and this loading
     // screen will be unmounted and thrown away.
-    this.props.navigation.navigate(this.props.user ? 'App' : 'Auth');
+    this.props.navigation.navigate(user && user.token ? 'App' : 'Auth');
   };
 
-  // Render any loading content that you like here
   render() {
     return (
       <View>
@@ -29,11 +29,9 @@ class AuthLoadingScreen extends React.Component {
 
 AuthLoadingScreen.propTypes = {
   navigation: PropTypes.object,
-  user: PropTypes.object
+  data: PropTypes.shape({
+    user: PropTypes.object
+  })
 };
 
-function select(state) {
-  return { user: state.user };
-}
-
-export default connect(select)(withNavigation(AuthLoadingScreen));
+export default graphql(AUTHENTICATED_USER)(withNavigation(AuthLoadingScreen));
