@@ -1,37 +1,69 @@
-import { ApolloClient } from 'apollo-client';
-import { createHttpLink } from 'apollo-link-http';
-import { ApolloLink } from 'apollo-link';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import store from './store';
+import { AsyncStorage } from 'react-native';
+import ApolloClient, { InMemoryCache } from 'apollo-boost';
+import { CachePersistor } from 'apollo-cache-persist';
+import resolvers, { initialState, AUTHENTICATED_USER } from './resolvers';
 
+// Support schema migrations https://git.io/Je58A
+const SCHEMA_VERSION = '1'; // Must be a string.
+const SCHEMA_VERSION_KEY = 'apollo-schema-version';
+
+// Environments
 const env = {
   dev: 'http://localhost:3000/admin/api',
   staging: 'https://dc510-staging.herokuapp.com/admin/api'
 };
+const isDev =  __DEV__; // eslint-disable-line
+const API_ENDPOINT = isDev ? env.dev : env.staging;
 
-const API_ENDPOINT = __DEV__ ? env.dev : env.staging; // eslint-disable-line
+// Apollo config
+const cache = new InMemoryCache();
+const config = {
+  uri: API_ENDPOINT,
+  cache,
+  request: async operation => {
+    // Append Authorization header to requests
+    try {
+      const { user } = cache.readQuery({
+        query: AUTHENTICATED_USER
+      });
+      operation.setContext({
+        headers: {
+          Authorization: `Bearer ${user.token}`
+        }
+      });
+    } catch (e) {
+      console.log('Cannot set Authorization header', e);
+    }
+  },
+  resolvers
+};
 
-const httpLink = createHttpLink({ uri: API_ENDPOINT });
+// Init data function
+const initData = () => cache.writeData({ data: initialState });
 
-const middlewareLink = new ApolloLink((operation, forward) => {
-  const state = store.getState();
-  const { user } = state;
-  const authorizationHeader = user ? `Bearer ${user.token}` : null;
-  if (user) {
-    operation.setContext({
-      headers: {
-        Authorization: authorizationHeader
-      }
-    });
+// Setup apollo
+export default async function SetupApollo() {
+  const client = new ApolloClient(config);
+  const persistor = new CachePersistor({
+    cache,
+    storage: AsyncStorage,
+    debug: isDev
+  });
+
+  // Read the current schema version from AsyncStorage.
+  const currentVersion = await AsyncStorage.getItem(SCHEMA_VERSION_KEY);
+
+  if (currentVersion === SCHEMA_VERSION) {
+    // If the current version matches the latest version,
+    // we're good to go and can restore the cache.
+    await persistor.restore();
+  } else {
+    // Otherwise, we'll want to purge the outdated persisted cache
+    // and mark ourselves as having updated to the latest version.
+    await persistor.purge();
+    await AsyncStorage.setItem(SCHEMA_VERSION_KEY, SCHEMA_VERSION);
   }
-  return forward(operation);
-});
 
-const httpLinkWithAuthToken = middlewareLink.concat(httpLink);
-
-const client = new ApolloClient({
-  link: httpLinkWithAuthToken,
-  cache: new InMemoryCache()
-});
-
-export default client;
+  client.onResetStore(async () => initData());
+  return client;
+}
