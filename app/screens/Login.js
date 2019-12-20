@@ -80,14 +80,8 @@ export default graphql(AUTHENTICATE_USER, {
   name: 'authenticate',
   options: {
     // Update local state after login
-    update: (
-      proxy,
-      {
-        data: {
-          authenticateUserWithPassword: { token, item }
-        }
-      }
-    ) => {
+    update: (proxy, { data: { authenticateUserWithPassword } }) => {
+      const { token, item } = authenticateUserWithPassword;
       const data = {
         ...initialState,
         user: { ...item, token }
