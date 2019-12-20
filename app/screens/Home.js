@@ -18,13 +18,13 @@ class HomeScreen extends React.Component {
 
   render() {
     const {
-      data: { loading, allActivities }
+      data: { loading, allTasks }
     } = this.props;
     return (
       <View style={styles.container}>
         <Text>Tasks</Text>
         {loading && <Text>Loading...</Text>}
-        {(allActivities || []).map(({ name, id }) => (
+        {(allTasks || []).map(({ name, id }) => (
           <Text key={id}>
             {id} - {name}
           </Text>
@@ -39,7 +39,7 @@ const GET_ASSIGNED_TASKS = gql`
     user @client {
       id @export(as: "userId")
     }
-    allActivities(where: { assignee: { id: $userId } }) {
+    allTasks(where: { assignee: { id: $userId } }) {
       id
       name
     }
@@ -54,7 +54,7 @@ export default graphql(GET_ASSIGNED_TASKS, {
 
 HomeScreen.propTypes = {
   data: PropTypes.shape({
-    allActivities: PropTypes.array,
+    allTasks: PropTypes.array,
     loading: PropTypes.bool
   })
 };
