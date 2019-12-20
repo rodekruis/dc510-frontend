@@ -39,7 +39,7 @@ const GET_ASSIGNED_TASKS = gql`
     user @client {
       id @export(as: "userId")
     }
-    allTasks(where: { assignee: { id: $userId } }) {
+    allTasks(where: { assignee: { id: $userId }, completed: false }) {
       id
       name
     }
