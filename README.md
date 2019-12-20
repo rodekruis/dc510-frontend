@@ -17,3 +17,5 @@ Open simulator, open expo app and add `exp://127.0.0.1:19000` to open the app.
 
 - [React native](https://facebook.github.io/react-native/)
 - [Expo](https://expo.io/)
+- [React Navigation](https://reactnavigation.org/en/)
+- [ApolloGraphql](https://www.apollographql.com/docs/react/)
