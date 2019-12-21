@@ -22,11 +22,11 @@ class TaskScreen extends React.Component {
     return (
       <SafeArea>
         <ScrollView>
-          <Inset all="medium">
+          <Inset all="large">
             <Text h4>{task.name}</Text>
-            <Stack size="medium" />
+            <Stack size="large" />
             <Text>{task.description}</Text>
-            <Stack size="medium" />
+            <Stack size="large" />
             <Button
               title="Add Observations"
               type="solid"
