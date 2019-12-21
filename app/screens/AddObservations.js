@@ -1,20 +1,47 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
 import MapView from 'react-native-maps';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import SafeArea from '../components/SafeArea';
 import { spacing } from '../constants';
 
 class AddObservationsScreen extends React.Component {
   static navigationOptions = ({
     navigation: {
+      popToTop,
       state: { params }
     }
   }) => ({
-    title: params.task.name
+    title: params.task.name,
+    headerRight: (
+      <HeaderButtons>
+        <Item
+          title="Cancel"
+          onPress={() =>
+            Alert.alert(
+              'Are you sure you want to cancel?',
+              'Cancelling will discard any observations you have made so far',
+              [
+                {
+                  text: 'No',
+                  style: 'cancel'
+                },
+                { text: 'Yes', onPress: () => popToTop() }
+              ],
+              { cancelable: false }
+            )
+          }
+        />
+      </HeaderButtons>
+    )
   });
+
+  cancel = () => {
+    console.log('cancelling');
+  };
 
   render() {
     const { popToTop } = this.props.navigation;
@@ -48,8 +75,9 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject
   },
   buttonContainer: {
-    flexDirection: 'row',
     marginVertical: spacing.massive,
-    backgroundColor: 'transparent'
+    paddingLeft: spacing.massive,
+    paddingRight: spacing.massive,
+    width: Dimensions.get('window').width
   }
 });
