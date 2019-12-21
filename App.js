@@ -1,10 +1,11 @@
 import React from 'react';
 import { ApolloProvider } from 'react-apollo';
 import { createAppContainer } from 'react-navigation';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, StatusBar } from 'react-native';
 import AppNavigator from './app/navigator';
-import ErrorBoundary from './app/components/ErrorBoundary';
 import SetupApollo from './app/apollo';
+
+import ErrorBoundary from './app/components/ErrorBoundary';
 
 const App = createAppContainer(AppNavigator);
 
@@ -28,6 +29,8 @@ export default class Root extends React.Component {
     return (
       <ErrorBoundary>
         <ApolloProvider client={client}>
+          {/* @todo add networkActivityIndicatorVisible while uploading */}
+          <StatusBar />
           <App />
         </ApolloProvider>
       </ErrorBoundary>
