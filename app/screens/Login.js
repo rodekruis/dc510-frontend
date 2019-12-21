@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View, Image, KeyboardAvoidingView } from 'react-native';
 import { Text, Button, Input } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
 import { graphql } from 'react-apollo';
@@ -9,8 +9,7 @@ import { gql } from 'apollo-boost';
 import { initialState, AUTHENTICATED_USER } from '../resolvers';
 import SafeArea from '../components/SafeArea';
 import { Stack, Inset } from '../components/Spacing';
-
-// @todo add loading indicator
+import logo from '../../assets/icon.png';
 
 class LoginScreen extends React.Component {
   constructor(props) {
@@ -49,9 +48,16 @@ class LoginScreen extends React.Component {
     const { error, email, password, loading } = this.state;
     return (
       <SafeArea style={styles.container}>
-        <KeyboardAvoidingView enabled>
+        <KeyboardAvoidingView
+          enabled
+          behavior="padding"
+          keyboardVerticalOffset={100}>
           <Inset all="huge">
-            {error && <Text style={styles.error}>{error}</Text>}
+            <View style={styles.centerAlign}>
+              <Image source={logo} />
+              <Stack size="large" />
+              {error && <Text style={styles.error}>{error}</Text>}
+            </View>
             <Stack size="medium" />
             <Input
               defaultValue={email}
@@ -129,6 +135,9 @@ export default graphql(AUTHENTICATE_USER, {
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center'
+  },
+  centerAlign: {
+    alignItems: 'center'
   },
   error: {
     color: 'red'
