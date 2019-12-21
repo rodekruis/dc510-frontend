@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { Text, Button, Input } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
 import { graphql } from 'react-apollo';
@@ -13,6 +13,11 @@ import { Stack, Inset } from '../components/Spacing';
 // @todo add loading indicator
 
 class LoginScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.passwordField = React.createRef();
+  }
+
   state = {
     loading: false,
     email: '',
@@ -44,32 +49,44 @@ class LoginScreen extends React.Component {
     const { error, email, password, loading } = this.state;
     return (
       <SafeArea style={styles.container}>
-        <Inset all="huge">
-          {error && <Text style={styles.error}>{error}</Text>}
-          <Stack size="medium" />
-          <Input
-            defaultValue={email}
-            placeholder="Email"
-            autoCapitalize="none"
-            autoCompleteType="email"
-            onChangeText={email => this.setState({ email, error: null })}
-          />
-          <Stack size="medium" />
-          <Input
-            defaultValue={password}
-            placeholder="Password"
-            autoCompleteType="password"
-            secureTextEntry
-            onChangeText={password => this.setState({ password, error: null })}
-          />
-          <Stack size="large" />
-          <Button
-            title="Login"
-            onPress={this.login}
-            type="solid"
-            loading={loading}
-          />
-        </Inset>
+        <KeyboardAvoidingView enabled>
+          <Inset all="huge">
+            {error && <Text style={styles.error}>{error}</Text>}
+            <Stack size="medium" />
+            <Input
+              defaultValue={email}
+              placeholder="Email"
+              autoCapitalize="none"
+              autoCompleteType="email"
+              containerStyle={styles.inputContainer}
+              returnKeyType="next"
+              onSubmitEditing={() => this.passwordField.current.focus()}
+              onChangeText={email => this.setState({ email, error: null })}
+              keyboardType="email-address"
+            />
+            <Stack size="medium" />
+            <Input
+              defaultValue={password}
+              placeholder="Password"
+              autoCompleteType="password"
+              containerStyle={styles.inputContainer}
+              returnKeyType="go"
+              onSubmitEditing={this.login}
+              secureTextEntry
+              onChangeText={password =>
+                this.setState({ password, error: null })
+              }
+              ref={this.passwordField}
+            />
+            <Stack size="large" />
+            <Button
+              title="Login"
+              onPress={this.login}
+              type="solid"
+              loading={loading}
+            />
+          </Inset>
+        </KeyboardAvoidingView>
       </SafeArea>
     );
   }
@@ -115,5 +132,8 @@ const styles = StyleSheet.create({
   },
   error: {
     color: 'red'
+  },
+  inputContainer: {
+    paddingHorizontal: 0
   }
 });
