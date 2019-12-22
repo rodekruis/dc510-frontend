@@ -25,7 +25,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "infoPList": {
+      "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses the location while recording observations to assess damange and/or to map floods.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses the location while recording observations to assess damange and/or to map floods.",
         "NSLocationAlwaysUsageDescription": "This app uses the location while recording observations to assess damange and/or to map floods.",
