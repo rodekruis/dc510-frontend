@@ -24,10 +24,21 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPList": {
+        "NSLocationWhenInUseUsageDescription": "This app uses the location while recording observations to assess damange and/or to map floods.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses the location while recording observations to assess damange and/or to map floods.",
+        "NSLocationAlwaysUsageDescription": "This app uses the location while recording observations to assess damange and/or to map floods.",
+        "NSCameraUsageDescription": "This app uses the camera to take pictures for observations made during damage assessment or flood extent mapping."
+      }
     },
     "android": {
-      "package": "com.rodekruis.dc510app"
+      "package": "com.rodekruis.dc510app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA"
+      ]
     }
   }
 }
