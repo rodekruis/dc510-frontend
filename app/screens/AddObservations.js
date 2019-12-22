@@ -52,7 +52,6 @@ class AddObservationsScreen extends React.Component {
     const { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
       // @todo display this message to the user
-      // or rather store it in cache?
       this.setState({
         errorMessage: 'Permission to access location was denied'
       });
@@ -91,11 +90,6 @@ class AddObservationsScreen extends React.Component {
     });
   };
 
-  removeMarker = key => () => {
-    console.log(key);
-    this.setState({ markers: this.state.markers.filter(m => m.key !== key) });
-  };
-
   render() {
     const { popToTop } = this.props.navigation;
     const { markers } = this.state;
@@ -119,8 +113,8 @@ class AddObservationsScreen extends React.Component {
                 <Callout>
                   <Text>Marker {marker.key}</Text>
                   {/* @todo
-                    unfortunately onPress even on any child elements
-                    don't work, find a solution
+                    unfortunately onPress event on any child elements
+                    don't get fired, find a solution
                     https://github.com/react-native-community/react-native-maps/issues/987 */}
                 </Callout>
               </Marker>
