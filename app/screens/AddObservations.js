@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, Dimensions, Alert } from 'react-native';
+import { View, StyleSheet, Dimensions, Alert, Platform } from 'react-native';
 import { Button, Text } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
 import MapView, { Marker, Callout } from 'react-native-maps';
@@ -8,7 +8,11 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import SafeArea from '../components/SafeArea';
-import { spacing } from '../constants';
+import { spacing, baseMap } from '../constants';
+
+// @todo
+// If offline, load from FileSystem
+const urlTemplate = `${baseMap}/{z}/{x}/{y}.png`;
 
 class AddObservationsScreen extends React.Component {
   static navigationOptions = ({
@@ -98,10 +102,12 @@ class AddObservationsScreen extends React.Component {
       <SafeArea>
         <View style={styles.container}>
           <MapView
+            mapType={Platform.OS == 'android' ? 'none' : 'standard'}
             showsUserLocation
             followsUserLocation
             onPress={this.onMapPress}
             style={styles.mapStyle}>
+            <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} />
             {markers.map(marker => (
               <Marker
                 title={`Marker ${marker.key}`}

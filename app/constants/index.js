@@ -17,3 +17,5 @@ export const fontSize = {
   large: 20,
   xlarge: 24
 };
+
+export const baseMap = 'http://c.tile.openstreetmap.org';
