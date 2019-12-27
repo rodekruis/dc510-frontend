@@ -104,7 +104,6 @@ class AddObservationsScreen extends React.Component {
           <MapView
             mapType={Platform.OS == 'android' ? 'none' : 'standard'}
             showsUserLocation
-            followsUserLocation
             onPress={this.onMapPress}
             style={styles.mapStyle}>
             <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} />
