@@ -5,6 +5,11 @@ module.exports = {
     "es6": true,
     "node": true
   },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "parser": "babel-eslint",
   "rules": {
     "prettier/prettier": ["error", {

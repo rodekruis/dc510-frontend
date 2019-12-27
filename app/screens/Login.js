@@ -39,9 +39,12 @@ class LoginScreen extends React.Component {
       this.props.navigation.navigate('App');
     } catch (e) {
       console.log(e);
-      this.setState({ error: 'Incorrect username or password' });
+      this.setState({
+        ...this.state,
+        error: 'Incorrect username or password',
+        loading: false
+      });
     }
-    this.setState({ ...this.state, loading: false });
   };
 
   render() {
