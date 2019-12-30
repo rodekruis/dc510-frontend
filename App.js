@@ -30,7 +30,7 @@ export default class Root extends React.Component {
       <ErrorBoundary>
         <ApolloProvider client={client}>
           {/* @todo add networkActivityIndicatorVisible while uploading */}
-          <StatusBar hidden={false} />
+          <StatusBar hidden={false} barStyle="dark-content" />
           <App />
         </ApolloProvider>
       </ErrorBoundary>
