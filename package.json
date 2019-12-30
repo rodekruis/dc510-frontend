@@ -12,6 +12,8 @@
     "apollo-boost": "~0.4.7",
     "apollo-cache-persist": "^0.1.1",
     "expo": "~36.0.0",
+    "expo-location": "~8.0.0",
+    "expo-permissions": "~8.0.0",
     "husky": "~3.1.0",
     "lint-staged": "~9.5.0",
     "lodash.flowright": "~3.5.0",
@@ -22,7 +24,7 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
     "react-native-elements": "^1.2.7",
     "react-native-gesture-handler": "~1.5.0",
-    "react-native-maps": "^0.26.1",
+    "react-native-maps": "github:madhums/react-native-maps#feature/mbtiles",
     "react-native-reanimated": "~1.4.0",
     "react-native-spacing-system": "^0.4.3",
     "react-native-web": "~0.11.7",
@@ -30,8 +32,7 @@
     "react-navigation-header-buttons": "^3.0.4",
     "react-navigation-stack": "~1.10.3",
     "striptags": "^3.1.1",
-    "expo-permissions": "~8.0.0",
-    "expo-location": "~8.0.0"
+    "truncate": "~2.1.0"
   },
   "devDependencies": {
     "babel-eslint": "~10.0.3",

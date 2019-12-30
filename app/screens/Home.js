@@ -7,6 +7,7 @@ import { gql } from 'apollo-boost';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ListItem } from 'react-native-elements';
 import striptags from 'striptags';
+import truncate from 'truncate';
 import SafeArea from '../components/SafeArea';
 
 class HomeScreen extends React.Component {
@@ -27,7 +28,10 @@ class HomeScreen extends React.Component {
     // only display tasks that are not completed
     const tasks = (allTasks || [])
       .filter(t => !t.completed)
-      .map(item => ({ ...item, description: striptags(item.description) }));
+      .map(item => ({
+        ...item,
+        description: truncate(striptags(item.description), 140)
+      }));
 
     return (
       <SafeArea>

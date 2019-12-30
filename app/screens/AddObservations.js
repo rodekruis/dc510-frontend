@@ -3,16 +3,17 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, Dimensions, Alert, Platform } from 'react-native';
 import { Button, Text } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
-import MapView, { Marker, Callout } from 'react-native-maps';
+import MapView, { Marker, Callout, MbTile } from 'react-native-maps';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import SafeArea from '../components/SafeArea';
-import { spacing, baseMap } from '../constants';
+import { spacing } from '../constants';
+import { fileLocation } from './Task';
 
 // @todo
 // If offline, load from FileSystem
-const urlTemplate = `${baseMap}/{z}/{x}/{y}.png`;
+// const urlTemplate = `${baseMap}/{z}/{x}/{y}.png`;
 
 class AddObservationsScreen extends React.Component {
   static navigationOptions = ({
@@ -95,9 +96,13 @@ class AddObservationsScreen extends React.Component {
   };
 
   render() {
-    const { popToTop } = this.props.navigation;
+    const {
+      popToTop,
+      state: {
+        params: { task }
+      }
+    } = this.props.navigation;
     const { markers } = this.state;
-
     return (
       <SafeArea>
         <View style={styles.container}>
@@ -106,7 +111,8 @@ class AddObservationsScreen extends React.Component {
             showsUserLocation
             onPress={this.onMapPress}
             style={styles.mapStyle}>
-            <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} />
+            {/* <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} /> */}
+            <MbTile pathTemplate={fileLocation(task)} />
             {markers.map(marker => (
               <Marker
                 title={`Marker ${marker.key}`}
