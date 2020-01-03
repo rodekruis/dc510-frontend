@@ -3,17 +3,31 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, Dimensions, Alert, Platform } from 'react-native';
 import { Button, Text } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
-import MapView, { Marker, Callout, MbTile } from 'react-native-maps';
+// import * as FileSystem from 'expo-file-system';
+import MapView, {
+  Marker,
+  Callout,
+  LocalTile
+  // AnimatedRegion,
+  // Animated
+} from 'react-native-maps';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import SafeArea from '../components/SafeArea';
 import { spacing } from '../constants';
-import { fileLocation } from './Task';
+import { tilesPath } from './Task';
 
 // @todo
 // If offline, load from FileSystem
 // const urlTemplate = `${baseMap}/{z}/{x}/{y}.png`;
+
+const initialRegion = {
+  latitude: 12.300748,
+  longitude: 76.667658,
+  latitudeDelta: 10,
+  longitudeDelta: 11
+};
 
 class AddObservationsScreen extends React.Component {
   static navigationOptions = ({
@@ -50,6 +64,9 @@ class AddObservationsScreen extends React.Component {
     location: null,
     errorMessage: null,
     markers: []
+    // region: new AnimatedRegion({
+    //   ...initialRegion
+    // })
   };
 
   // get permission for location
@@ -95,6 +112,8 @@ class AddObservationsScreen extends React.Component {
     });
   };
 
+  // onRegionChange = region => this.state.region.setValue(region);
+
   render() {
     const {
       popToTop,
@@ -102,7 +121,8 @@ class AddObservationsScreen extends React.Component {
         params: { task }
       }
     } = this.props.navigation;
-    const { markers } = this.state;
+    const { markers /* region */ } = this.state;
+
     return (
       <SafeArea>
         <View style={styles.container}>
@@ -110,9 +130,13 @@ class AddObservationsScreen extends React.Component {
             mapType={Platform.OS == 'android' ? 'none' : 'standard'}
             showsUserLocation
             onPress={this.onMapPress}
+            initialRegion={initialRegion}
             style={styles.mapStyle}>
             {/* <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} /> */}
-            <MbTile pathTemplate={fileLocation(task)} />
+            <LocalTile
+              pathTemplate={`${tilesPath(task)}/{z}/{x}/{y}.pbf`}
+              tileSize={256}
+            />
             {markers.map(marker => (
               <Marker
                 title={`Marker ${marker.key}`}

@@ -6,11 +6,23 @@ import { withNavigation } from 'react-navigation';
 import * as FileSystem from 'expo-file-system';
 import SafeArea from '../components/SafeArea';
 import { Inset, Stack } from '../components/Spacing';
+import { unzip, subscribe } from 'react-native-zip-archive';
 
-const mbtileUrl =
-  'https://openmaptiles.com/download/WyJiMDJlN2ExZi0xM2YyLTQyYjEtYjRmNC04YzZjMzA0Yjc4ZDciLCItMSIsODQyMV0.XgpR_w.TpsvlbyjIISndgNkTVrkzAfJwhE/osm-2017-07-03-v3.6.1-netherlands_amsterdam.mbtiles?usage=personal';
-export const fileLocation = task =>
-  FileSystem.documentDirectory + `task-${task.id}.mbtiles`;
+const downloadUrl =
+  'https://dl.dropboxusercontent.com/s/a389a9djp4jvapu/tiles1.zip?dl=0';
+
+const unprefixedDir = path => `/${path.replace(/^file:\/\/\//g, '')}`;
+const TILES_DIR = FileSystem.documentDirectory;
+export const tilesDir = task => TILES_DIR + `task-${task.id}`;
+export const tilesPath = task => `${tilesDir(task)}/tiles`;
+export const zipFilePath = task => `${tilesDir(task)}.zip`;
+
+const initialState = {
+  downloadProgress: 0,
+  hasDownload: false,
+  zipProgress: 0,
+  hasUnzipped: false
+};
 
 class TaskScreen extends React.Component {
   static navigationOptions = {
@@ -18,8 +30,7 @@ class TaskScreen extends React.Component {
   };
 
   state = {
-    downloadProgress: 0,
-    hasDownload: false
+    ...initialState
   };
 
   downloadMap = task => async () => {
@@ -33,8 +44,8 @@ class TaskScreen extends React.Component {
     };
 
     const downloadResumable = FileSystem.createDownloadResumable(
-      mbtileUrl,
-      fileLocation(task),
+      downloadUrl,
+      zipFilePath(task),
       {},
       callback
     );
@@ -42,24 +53,55 @@ class TaskScreen extends React.Component {
     try {
       const { uri } = await downloadResumable.downloadAsync();
       console.log('Finished downloading to ', uri);
+
+      // RNFS takes unprefixed path
+      // Expo Filesystem uses file:/// prefix where as RNFS used by react-native-unzip uses /Path/to/file
+      // https://github.com/mockingbot/react-native-zip-archive/issues/152#issuecomment-547356873
+
+      const path = await unzip(
+        unprefixedDir(uri), // source .zip file
+        unprefixedDir(tilesDir(task)) // target task-{id}
+      );
+      console.log('Unzipped to path', path);
+      await FileSystem.deleteAsync(uri); // .zip file
+      console.log(`Removed zip file ${uri}`);
     } catch (e) {
       console.error(e);
     }
   };
 
   clearDownload = task => async () => {
-    await FileSystem.deleteAsync(fileLocation(task));
-    this.setState({ downloadProgress: 0, hasDownload: false });
+    try {
+      await Promise.all([
+        FileSystem.deleteAsync(tilesDir(task)),
+        FileSystem.deleteAsync(zipFilePath(task))
+      ]);
+    } catch (e) {
+      console.log(e.toString());
+    }
+    this.setState({ ...initialState });
   };
 
-  hasDownload = async task => {
-    const { exists } = await FileSystem.getInfoAsync(fileLocation(task));
-    this.setState({ hasDownload: exists });
+  check = async task => {
+    const { exists: hasDownload } = await FileSystem.getInfoAsync(
+      zipFilePath(task)
+    );
+    const { exists: hasUnzipped } = await FileSystem.getInfoAsync(
+      tilesPath(task)
+    );
+    this.setState({ hasDownload, hasUnzipped });
   };
 
   componentDidMount() {
-    // check if it has download and set required state
-    this.hasDownload(this.props.navigation.state.params.task);
+    // check if it has downloaded and unzipped required files/directories
+    this.check(this.props.navigation.state.params.task);
+    this.zipProgress = subscribe(({ progress }) => {
+      this.setState({ zipProgress: parseInt(progress * 100) });
+    });
+  }
+
+  componentWillUnmount() {
+    this.zipProgress.remove();
   }
 
   render() {
@@ -69,9 +111,15 @@ class TaskScreen extends React.Component {
         params: { task }
       }
     } = this.props.navigation;
-    const { downloadProgress: progress, hasDownload } = this.state;
-    const downloading = progress > 0 && progress !== 100;
-    const downloaded = hasDownload || progress === 100;
+    const {
+      downloadProgress,
+      hasDownload,
+      zipProgress,
+      hasUnzipped
+    } = this.state;
+    const downloading = downloadProgress > 0 && downloadProgress !== 100;
+    const downloaded = hasDownload || downloadProgress === 100;
+    const unzipped = hasUnzipped || zipProgress === 100;
 
     return (
       <SafeArea>
@@ -81,17 +129,25 @@ class TaskScreen extends React.Component {
             <Stack size="large" />
             <Text>{task.description}</Text>
             <Stack size="large" />
-            {!downloaded && (
+            {!unzipped && !downloaded && (
               <Button
                 type="outline"
                 onPress={this.downloadMap(task)}
-                title={downloading ? `Downloading... ${progress}%` : 'Download'}
+                title={
+                  downloading
+                    ? `Downloading... ${downloadProgress}%`
+                    : 'Download'
+                }
               />
             )}
-            {downloaded && (
+            {(downloaded || unzipped) && (
               <Button
                 type="outline"
-                title="Clear download"
+                title={
+                  downloaded && !unzipped
+                    ? `Unzipping...${zipProgress}%`
+                    : 'Clear download'
+                }
                 onPress={this.clearDownload(task)}
               />
             )}
