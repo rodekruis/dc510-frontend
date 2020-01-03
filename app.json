@@ -30,7 +30,10 @@
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses the location while recording observations to assess damange and/or to map floods.",
         "NSLocationAlwaysUsageDescription": "This app uses the location while recording observations to assess damange and/or to map floods.",
         "NSCameraUsageDescription": "This app uses the camera to take pictures for observations made during damage assessment or flood extent mapping."
-      }
+      },
+      "bundleIdentifier": "com.rodekruis.nl.dc510",
+      "publishBundlePath": "ios/510-data-collect/Supporting/shell-app.bundle",
+      "publishManifestPath": "ios/510-data-collect/Supporting/shell-app-manifest.json"
     },
     "android": {
       "package": "com.rodekruis.dc510app",
@@ -38,7 +41,15 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "CAMERA"
-      ]
-    }
+      ],
+      "publishBundlePath": "android/app/src/main/assets/shell-app.bundle",
+      "publishManifestPath": "android/app/src/main/assets/shell-app-manifest.json"
+    },
+    "isDetached": true,
+    "detach": {
+      "iosExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/ios-v2.14.2-sdk36.0.0-e055f8a6-47bf-455c-9f14-d5a631ea2dd3.tar.gz",
+      "androidExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/android-v2.14.0-sdk36.0.0-fb8689e6-fd42-4b18-b01f-ac2ef3bc8681.tar.gz"
+    },
+    "scheme": "exp50b9a015076e4f9ba52a850457fae9b0"
   }
 }
