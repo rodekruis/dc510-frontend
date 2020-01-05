@@ -16,7 +16,7 @@ import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import SafeArea from '../components/SafeArea';
 import { spacing } from '../constants';
-import { tilesPath } from './Task';
+import { tilesPath, unprefixedDir } from './Task';
 
 // @todo
 // If offline, load from FileSystem
@@ -134,7 +134,7 @@ class AddObservationsScreen extends React.Component {
             style={styles.mapStyle}>
             {/* <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} /> */}
             <LocalTile
-              pathTemplate={`${tilesPath(task)}/{z}/{x}/{y}.pbf`}
+              pathTemplate={`${unprefixedDir(tilesPath(task))}/{z}/{x}/{y}.pbf`}
               tileSize={256}
             />
             {markers.map(marker => (

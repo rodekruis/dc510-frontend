@@ -11,7 +11,7 @@ import { unzip, subscribe } from 'react-native-zip-archive';
 const downloadUrl =
   'https://dl.dropboxusercontent.com/s/a389a9djp4jvapu/tiles1.zip?dl=0';
 
-const unprefixedDir = path => `/${path.replace(/^file:\/\/\//g, '')}`;
+export const unprefixedDir = path => `/${path.replace(/^file:\/\/\//g, '')}`;
 const TILES_DIR = FileSystem.documentDirectory;
 export const tilesDir = task => TILES_DIR + `task-${task.id}`;
 export const tilesPath = task => `${tilesDir(task)}/tiles`;
