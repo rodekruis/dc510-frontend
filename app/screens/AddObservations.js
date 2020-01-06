@@ -7,8 +7,21 @@ import MapView, { Marker, Callout } from 'react-native-maps';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
+import SegmentedControlTab from 'react-native-segmented-control-tab';
 import SafeArea from '../components/SafeArea';
+import SlideView from '../components/SlideView';
 import { spacing, baseMap } from '../constants';
+import { Inset, Stack } from '../components/Spacing';
+
+// @todo get this from api
+const severities = ['None', 'Mild', 'High', 'Severe'];
+// Here keys 1-4 are ids of severities
+const severityIcon = {
+  1: require('../../assets/marker-severity-none.png'),
+  2: require('../../assets/marker-severity-mild.png'),
+  3: require('../../assets/marker-severity-high.png'),
+  4: require('../../assets/marker-severity-severe.png')
+};
 
 // @todo
 // If offline, load from FileSystem
@@ -48,7 +61,8 @@ class AddObservationsScreen extends React.Component {
   state = {
     location: null,
     errorMessage: null,
-    markers: []
+    markers: [],
+    activeMarker: null
   };
 
   // get permission for location
@@ -72,10 +86,14 @@ class AddObservationsScreen extends React.Component {
   // add markers on map press
   onMapPress = e => {
     const { markers } = this.state;
+    const nextKey = !markers.length
+      ? 1
+      : Math.max(...markers.map(m => m.key)) + 1;
     this.setState({
       markers: markers.concat({
         coordinate: e.nativeEvent.coordinate,
-        key: markers.length + 1
+        key: nextKey,
+        severity: 1 // set default severity to 'none'
       })
     });
   };
@@ -94,9 +112,44 @@ class AddObservationsScreen extends React.Component {
     });
   };
 
-  render() {
+  openMenu = activeMarker => () => this.setState({ activeMarker });
+
+  unsetActiveMarker = () => this.setState({ activeMarker: null });
+
+  removeMarker = () => {
+    const { markers, activeMarker } = this.state;
+    this.setState({
+      markers: markers.filter(m => m.key !== activeMarker.key),
+      activeMarker: null
+    });
+  };
+
+  setSeverity = index => {
+    const { markers, activeMarker } = this.state;
+    const severity = index + 1;
+    this.setState({
+      activeMarker: { ...activeMarker, severity },
+      markers: markers.map(m => {
+        if (m.key === activeMarker.key) m.severity = severity;
+        return m;
+      })
+    });
+  };
+
+  addPhotos = () => {
+    // @todo
+    // open camera, take pictures, add them back to state
+  };
+
+  addObservations = () => {
     const { popToTop } = this.props.navigation;
-    const { markers } = this.state;
+    // @todo
+    // add mutation to store it in the client cache
+    popToTop(); // navigate back
+  };
+
+  render() {
+    const { markers, activeMarker } = this.state;
 
     return (
       <SafeArea>
@@ -113,9 +166,12 @@ class AddObservationsScreen extends React.Component {
                 key={marker.key}
                 coordinate={marker.coordinate}
                 stopPropagation
+                image={severityIcon[marker.severity]}
+                centerOffset={{ x: 0, y: -16 }} // ios
+                anchor={{ x: 0, y: -16 }} // android
                 draggable
                 onDragEnd={this.onMarkerDragEnd(marker.key)}>
-                <Callout>
+                <Callout onPress={this.openMenu(marker)}>
                   <Text>Marker {marker.key}</Text>
                   {/* @todo
                     unfortunately onPress event on any child elements
@@ -126,8 +182,34 @@ class AddObservationsScreen extends React.Component {
             ))}
           </MapView>
           <View style={styles.buttonContainer}>
-            <Button title="Finish" type="solid" onPress={() => popToTop()} />
+            <Button
+              title="Finish"
+              type="solid"
+              onPress={this.addObservations}
+            />
           </View>
+          <SlideView
+            visible={!!activeMarker}
+            duration={100}
+            onClosed={this.unsetActiveMarker}>
+            <Inset all="huge">
+              <Text h3 style={styles.severityText}>
+                Severity
+              </Text>
+              <Stack size="medium" />
+              <SegmentedControlTab
+                values={severities}
+                selectedIndex={(activeMarker && activeMarker.severity - 1) || 0}
+                onTabPress={this.setSeverity}
+              />
+              <Stack size="medium" />
+              <Button title="Add photos" onPress={this.addPhotos} />
+              <Stack size="medium" />
+              <Button title="Remove marker" onPress={this.removeMarker} />
+              <Stack size="medium" />
+              <Button title="Done" onPress={this.unsetActiveMarker} />
+            </Inset>
+          </SlideView>
         </View>
       </SafeArea>
     );
@@ -154,5 +236,8 @@ const styles = StyleSheet.create({
     paddingLeft: spacing.massive,
     paddingRight: spacing.massive,
     width: Dimensions.get('window').width
+  },
+  severityText: {
+    color: 'white'
   }
 });
