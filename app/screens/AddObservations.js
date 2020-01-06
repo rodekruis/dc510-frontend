@@ -14,9 +14,9 @@ import { spacing, baseMap } from '../constants';
 import { Inset, Stack } from '../components/Spacing';
 
 // @todo get this from api
-const severities = ['None', 'Mild', 'High', 'Severe'];
+const SEVERITIES = ['None', 'Mild', 'High', 'Severe'];
 // Here keys 1-4 are ids of severities
-const severityIcon = {
+const SEVERITY_ICON = {
   1: require('../../assets/marker-severity-none.png'),
   2: require('../../assets/marker-severity-mild.png'),
   3: require('../../assets/marker-severity-high.png'),
@@ -150,6 +150,8 @@ class AddObservationsScreen extends React.Component {
 
   render() {
     const { markers, activeMarker } = this.state;
+    // Disable finish button until all severities are set
+    const cannotFinish = markers.map(m => m.severity).includes(1);
 
     return (
       <SafeArea>
@@ -166,7 +168,7 @@ class AddObservationsScreen extends React.Component {
                 key={marker.key}
                 coordinate={marker.coordinate}
                 stopPropagation
-                image={severityIcon[marker.severity]}
+                image={SEVERITY_ICON[marker.severity]}
                 centerOffset={{ x: 0, y: -16 }} // ios
                 anchor={{ x: 0, y: -16 }} // android
                 draggable
@@ -185,6 +187,7 @@ class AddObservationsScreen extends React.Component {
             <Button
               title="Finish"
               type="solid"
+              disabled={cannotFinish}
               onPress={this.addObservations}
             />
           </View>
@@ -198,7 +201,7 @@ class AddObservationsScreen extends React.Component {
               </Text>
               <Stack size="medium" />
               <SegmentedControlTab
-                values={severities}
+                values={SEVERITIES}
                 selectedIndex={(activeMarker && activeMarker.severity - 1) || 0}
                 onTabPress={this.setSeverity}
               />
@@ -207,7 +210,12 @@ class AddObservationsScreen extends React.Component {
               <Stack size="medium" />
               <Button title="Remove marker" onPress={this.removeMarker} />
               <Stack size="medium" />
-              <Button title="Done" onPress={this.unsetActiveMarker} />
+              <Button
+                title="Done"
+                onPress={this.unsetActiveMarker}
+                // Disable the button until severity is set
+                disabled={activeMarker && activeMarker.severity === 1}
+              />
             </Inset>
           </SlideView>
         </View>
