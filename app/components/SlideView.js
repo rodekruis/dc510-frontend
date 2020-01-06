@@ -123,13 +123,14 @@ class SlideView extends Component {
 
     if (this.state.renderComponent) {
       return (
-        <Animated.View style={[absolute, containerStyle]}>
+        <Animated.ScrollView style={[absolute, containerStyle]}>
           <TouchableWithoutFeedback onPress={this.tapped}>
-            <Animated.View style={[absolute, sliderStyle, this.props.style]}>
+            <Animated.ScrollView
+              style={[absolute, sliderStyle, this.props.style]}>
               {this.props.children}
-            </Animated.View>
+            </Animated.ScrollView>
           </TouchableWithoutFeedback>
-        </Animated.View>
+        </Animated.ScrollView>
       );
     } else {
       return <View />;
