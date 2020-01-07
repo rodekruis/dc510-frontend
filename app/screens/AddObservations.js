@@ -13,6 +13,8 @@ import SlideView from '../components/SlideView';
 import { spacing, baseMap } from '../constants';
 import { Inset, Stack } from '../components/Spacing';
 import Images from '../components/Images';
+import { graphql } from 'react-apollo';
+import { gql } from 'apollo-boost';
 
 // @todo get this from api
 const SEVERITIES = ['None', 'Mild', 'High', 'Severe'];
@@ -184,10 +186,11 @@ class AddObservationsScreen extends React.Component {
     });
   };
 
-  addObservations = () => {
+  addObservations = async () => {
     const { popToTop } = this.props.navigation;
-    // @todo
-    // add mutation to store it in the client cache
+    await this.props.addObservations({
+      variables: { items: this.state.markers }
+    });
     popToTop(); // navigate back
   };
 
@@ -277,10 +280,19 @@ class AddObservationsScreen extends React.Component {
   }
 }
 
-export default withNavigation(AddObservationsScreen);
+const ADD_OBSERVATIONS = gql`
+  mutation($items: [Observation]) {
+    addObservations(items: $items) @client
+  }
+`;
+
+export default graphql(ADD_OBSERVATIONS, {
+  name: 'addObservations'
+})(withNavigation(AddObservationsScreen));
 
 AddObservationsScreen.propTypes = {
-  navigation: PropTypes.object
+  navigation: PropTypes.object,
+  addObservations: PropTypes.func
 };
 
 export const buttonContainerStyle = {
