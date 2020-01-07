@@ -1,4 +1,5 @@
 // Taken from https://github.com/Devnetik/react-native-slide-view/blob/master/lib/slideView.js
+// May be better to use Overlay instead? https://react-native-elements.github.io/react-native-elements/docs/overlay.html
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';

@@ -8,6 +8,7 @@ import * as FileSystem from 'expo-file-system';
 import uuidv4 from 'uuid/v4';
 import { buttonContainerStyle } from './AddObservations';
 import Images from '../components/Images';
+import SafeArea from '../components/SafeArea';
 import { Stack } from '../components/Spacing';
 import { IMAGES_DIR, spacing } from '../constants';
 
@@ -65,7 +66,7 @@ class Camera extends React.Component {
     } else if (!isFocused) return null;
 
     return (
-      <View style={styles.container}>
+      <SafeArea>
         <CameraExpo
           style={styles.container}
           ref={ref => {
@@ -87,7 +88,7 @@ class Camera extends React.Component {
             </View>
           </View>
         </CameraExpo>
-      </View>
+      </SafeArea>
     );
   }
 }
