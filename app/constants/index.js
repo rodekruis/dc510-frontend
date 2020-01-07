@@ -1,3 +1,5 @@
+import * as FileSystem from 'expo-file-system';
+
 export const spacing = {
   atomic: 2,
   micro: 4,
@@ -19,3 +21,5 @@ export const fontSize = {
 };
 
 export const baseMap = 'http://c.tile.openstreetmap.org';
+
+export const IMAGES_DIR = `${FileSystem.documentDirectory}images`;

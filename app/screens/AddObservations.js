@@ -12,6 +12,7 @@ import SafeArea from '../components/SafeArea';
 import SlideView from '../components/SlideView';
 import { spacing, baseMap } from '../constants';
 import { Inset, Stack } from '../components/Spacing';
+import Images from '../components/Images';
 
 // @todo get this from api
 const SEVERITIES = ['None', 'Mild', 'High', 'Severe'];
@@ -93,7 +94,8 @@ class AddObservationsScreen extends React.Component {
       markers: markers.concat({
         coordinate: e.nativeEvent.coordinate,
         key: nextKey,
-        severity: 1 // set default severity to 'none'
+        severity: 1, // set default severity to 'none'
+        images: []
       })
     });
   };
@@ -127,6 +129,9 @@ class AddObservationsScreen extends React.Component {
   setSeverity = index => {
     const { markers, activeMarker } = this.state;
     const severity = index + 1;
+    // make sure that severity is updated in both
+    // list - markers
+    // detail - activeMarker
     this.setState({
       activeMarker: { ...activeMarker, severity },
       markers: markers.map(m => {
@@ -136,9 +141,29 @@ class AddObservationsScreen extends React.Component {
     });
   };
 
+  // update images in both list and detail
+  onImageAdd = image => {
+    const { markers, activeMarker } = this.state;
+    const images = activeMarker.images.concat(image);
+    this.setState({
+      activeMarker: { ...activeMarker, images },
+      markers: markers.map(m => {
+        if (m.key === activeMarker.key) m.images = images;
+        return m;
+      })
+    });
+  };
+
   addPhotos = () => {
-    // @todo
-    // open camera, take pictures, add them back to state
+    const {
+      navigate,
+      state: { params }
+    } = this.props.navigation;
+    navigate('Camera', {
+      activeMarker: this.state.activeMarker,
+      task: params.task,
+      onImageAdd: this.onImageAdd
+    });
   };
 
   addObservations = () => {
@@ -216,6 +241,8 @@ class AddObservationsScreen extends React.Component {
                 // Disable the button until severity is set
                 disabled={activeMarker && activeMarker.severity === 1}
               />
+              <Stack size="medium" />
+              <Images items={(activeMarker && activeMarker.images) || []} />
             </Inset>
           </SlideView>
         </View>
@@ -230,6 +257,13 @@ AddObservationsScreen.propTypes = {
   navigation: PropTypes.object
 };
 
+export const buttonContainerStyle = {
+  marginVertical: spacing.massive,
+  paddingLeft: spacing.massive,
+  paddingRight: spacing.massive,
+  width: Dimensions.get('window').width
+};
+
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
@@ -239,12 +273,7 @@ const styles = StyleSheet.create({
   mapStyle: {
     ...StyleSheet.absoluteFillObject
   },
-  buttonContainer: {
-    marginVertical: spacing.massive,
-    paddingLeft: spacing.massive,
-    paddingRight: spacing.massive,
-    width: Dimensions.get('window').width
-  },
+  buttonContainer: buttonContainerStyle,
   severityText: {
     color: 'white'
   }
