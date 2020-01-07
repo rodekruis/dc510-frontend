@@ -75,40 +75,56 @@ class AddObservationsScreen extends React.Component {
         errorMessage: 'Permission to access location was denied'
       });
     } else {
-      this.getLocation();
+      const location = await this.getCurrentLocation();
+      this.setState({ location });
     }
   }
 
-  getLocation = async () => {
-    const { coords: location } = await Location.getCurrentPositionAsync({});
-    this.setState({ location });
+  getCurrentLocation = async () => {
+    const { coords } = await Location.getCurrentPositionAsync({});
+    return coords;
+  };
+
+  getLocationInfo = async coords => {
+    const current = await this.getCurrentLocation();
+    return {
+      marked_lat: coords.latitude,
+      marked_lng: coords.longitude,
+      lat: current.latitude,
+      lng: current.longitude
+    };
   };
 
   // add markers on map press
-  onMapPress = e => {
+  onMapPress = async e => {
     const { markers } = this.state;
+    const { params } = this.props.navigation.state;
     const nextKey = !markers.length
       ? 1
       : Math.max(...markers.map(m => m.key)) + 1;
+    const locInfo = await this.getLocationInfo(e.nativeEvent.coordinate);
     this.setState({
       markers: markers.concat({
-        coordinate: e.nativeEvent.coordinate,
+        ...locInfo,
         key: nextKey,
         severity: 1, // set default severity to 'none'
-        images: []
+        images: [],
+        task: params.task.id,
+        recordedAt: new Date().toISOString()
       })
     });
   };
 
   // update marker coordinates on drag end
-  onMarkerDragEnd = key => e => {
+  onMarkerDragEnd = key => async e => {
     const { markers } = this.state;
+    const locInfo = await this.getLocationInfo(e.nativeEvent.coordinate);
     this.setState({
       markers: markers.map(m => {
         if (m.key !== key) return m;
         return {
           ...m,
-          coordinate: e.nativeEvent.coordinate
+          ...locInfo
         };
       })
     });
@@ -154,6 +170,8 @@ class AddObservationsScreen extends React.Component {
     });
   };
 
+  // @todo
+  // add a way to remove images
   addPhotos = () => {
     const {
       navigate,
@@ -191,7 +209,10 @@ class AddObservationsScreen extends React.Component {
               <Marker
                 title={`Marker ${marker.key}`}
                 key={marker.key}
-                coordinate={marker.coordinate}
+                coordinate={{
+                  latitude: marker.marked_lat,
+                  longitude: marker.marked_lng
+                }}
                 stopPropagation
                 image={SEVERITY_ICON[marker.severity]}
                 centerOffset={{ x: 0, y: -16 }} // ios
@@ -199,7 +220,12 @@ class AddObservationsScreen extends React.Component {
                 draggable
                 onDragEnd={this.onMarkerDragEnd(marker.key)}>
                 <Callout onPress={this.openMenu(marker)}>
-                  <Text>Marker {marker.key}</Text>
+                  <Inset all="tiny">
+                    <Text>Marker {marker.key}</Text>
+                    {marker.images.length > 0 && (
+                      <Text>{marker.images.length} image(s)</Text>
+                    )}
+                  </Inset>
                   {/* @todo
                     unfortunately onPress event on any child elements
                     don't get fired, find a solution
