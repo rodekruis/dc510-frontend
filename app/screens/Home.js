@@ -8,6 +8,7 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { ListItem } from 'react-native-elements';
 import striptags from 'striptags';
 import SafeArea from '../components/SafeArea';
+import ButtonSync from '../components/ButtonSync';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation: { navigate } }) => ({
@@ -31,6 +32,7 @@ class HomeScreen extends React.Component {
 
     return (
       <SafeArea>
+        <ButtonSync />
         <FlatList
           data={tasks}
           keyExtractor={item => item.id}
