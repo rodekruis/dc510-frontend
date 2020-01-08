@@ -48,7 +48,7 @@ class ButtonSync extends React.Component {
   render() {
     const { observations } = this.props.data;
     const { error, loading } = this.state;
-    const count = observations.length;
+    const count = (observations || []).length;
     return (
       <Inset all="medium">
         {error && (
@@ -58,7 +58,7 @@ class ButtonSync extends React.Component {
           </View>
         )}
         <Button title="Sync" loading={loading} onPress={this.sync} />
-        {count && (
+        {count > 0 && (
           <View>
             <Stack size="medium" />
             <Text>You have {count} observations to sync</Text>
