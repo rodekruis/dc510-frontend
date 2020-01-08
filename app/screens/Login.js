@@ -124,6 +124,7 @@ export default graphql(AUTHENTICATE_USER, {
   name: 'authenticate',
   options: {
     // Update local state after login
+    // https://www.apollographql.com/docs/react/api/react-hoc/#optionsupdate
     update: (proxy, { data: { authenticateUserWithPassword } }) => {
       const { token, item } = authenticateUserWithPassword;
       const data = {

@@ -66,6 +66,7 @@ class ButtonSync extends React.Component {
     // We are providing an initial state observations: [], yet it's undefined.
     // Perhaps this is a bug in apollo client?
     const count = (observations || []).length;
+    if (!count) return null;
     return (
       <Inset all="medium">
         {error && (
@@ -75,12 +76,8 @@ class ButtonSync extends React.Component {
           </View>
         )}
         <Button title="Sync" loading={loading} onPress={this.sync} />
-        {count > 0 && (
-          <View>
-            <Stack size="medium" />
-            <Text>You have {count} observations to sync</Text>
-          </View>
-        )}
+        <Stack size="medium" />
+        <Text>You have {count} observations to sync</Text>
       </Inset>
     );
   }
@@ -95,9 +92,8 @@ const CREATE_OBSERVATIONS = gql`
   mutation($observations: [ObservationsCreateInput]) {
     createObservations(data: $observations) {
       id
-      severity {
+      task {
         id
-        name
       }
     }
   }
@@ -105,7 +101,18 @@ const CREATE_OBSERVATIONS = gql`
 
 export default compose(
   graphql(GET_OBSERVATIONS),
-  graphql(CREATE_OBSERVATIONS, { name: 'createObservations' })
+  graphql(CREATE_OBSERVATIONS, {
+    name: 'createObservations',
+    options: {
+      // empty observations after syncing
+      update: proxy => {
+        const data = { observations: [] };
+        proxy.writeQuery({ query: GET_OBSERVATIONS, data });
+      }
+      // @todo may be we can store this in stats or something
+      // so that we can give progress indicator to the user?
+    }
+  })
 )(ButtonSync);
 
 const styles = StyleSheet.create({
