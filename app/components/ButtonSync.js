@@ -31,12 +31,17 @@ class ButtonSync extends React.Component {
         .map(o => ({
           ...o,
           task: { connect: { id: o.task } }, // TaskRelateToOneInput
-          severity: { connect: { id: o.severity } } // SeverityRelateToOneInput
+          severity: { connect: { id: o.severity } }, // SeverityRelateToOneInput
+          image_urls: {
+            create: o.images.map(img => ({
+              url: `https://cloud.rodekruis.nl/${img}`
+            }))
+          }
         }))
         .map(
           ({ key, images, ...o }) => ({ data: o }) // eslint-disable-line
         );
-
+      console.log(observations);
       const { data } = await this.props.createObservations({
         variables: { observations }
       });
