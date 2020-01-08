@@ -25,10 +25,10 @@ class HomeScreen extends React.Component {
       navigation: { navigate },
       data: { loading, allTasks, refetch }
     } = this.props;
-    // only display tasks that are not completed
-    const tasks = (allTasks || [])
-      .filter(t => !t.completed)
-      .map(item => ({ ...item, description: striptags(item.description) }));
+    const tasks = (allTasks || []).map(item => ({
+      ...item,
+      description: striptags(item.description)
+    }));
 
     return (
       <SafeArea>
@@ -58,7 +58,7 @@ const GET_ASSIGNED_TASKS = gql`
     user @client {
       id @export(as: "userId")
     }
-    allTasks(where: { assignee: { id: $userId } }) {
+    allTasks(where: { assignee: { id: $userId }, completed: false }) {
       id
       name
       description
