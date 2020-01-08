@@ -41,7 +41,7 @@ class ButtonSync extends React.Component {
         .map(
           ({ key, images, ...o }) => ({ data: o }) // eslint-disable-line
         );
-      console.log(observations);
+
       const { data } = await this.props.createObservations({
         variables: { observations }
       });
