@@ -6,7 +6,7 @@ import { withNavigation } from 'react-navigation';
 import { graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
 
-import { initialState, AUTHENTICATED_USER } from '../resolvers';
+import { AUTHENTICATED_USER } from '../resolvers';
 import SafeArea from '../components/SafeArea';
 import { Stack, Inset } from '../components/Spacing';
 import logo from '../../assets/icon.png';
@@ -127,7 +127,6 @@ export default graphql(AUTHENTICATE_USER, {
     update: (proxy, { data: { authenticateUserWithPassword } }) => {
       const { token, item } = authenticateUserWithPassword;
       const data = {
-        ...initialState,
         user: { ...item, token }
       };
       proxy.writeQuery({ query: AUTHENTICATED_USER, data });

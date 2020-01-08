@@ -27,9 +27,15 @@ class ButtonSync extends React.Component {
       // - Add images via createMediaItem mutation
 
       // transform it into type `ObservationsCreateInput`
-      const observations = this.props.data.observations.map(
-        ({ key, images, ...o }) => ({ data: o }) // eslint-disable-line
-      );
+      const observations = this.props.data.observations
+        .map(o => ({
+          ...o,
+          task: { connect: { id: o.task } }, // TaskRelateToOneInput
+          severity: { connect: { id: o.severity } } // SeverityRelateToOneInput
+        }))
+        .map(
+          ({ key, images, ...o }) => ({ data: o }) // eslint-disable-line
+        );
 
       const { data } = await this.props.createObservations({
         variables: { observations }
@@ -48,6 +54,12 @@ class ButtonSync extends React.Component {
   render() {
     const { observations } = this.props.data;
     const { error, loading } = this.state;
+    // @todo investigate
+    // For some reason, observations evaluates to undefined when there's nothing
+    // in the cache yet. From the documentation it looks like this should be
+    // taken from what's available in `data` object of the cache.
+    // We are providing an initial state observations: [], yet it's undefined.
+    // Perhaps this is a bug in apollo client?
     const count = (observations || []).length;
     return (
       <Inset all="medium">
