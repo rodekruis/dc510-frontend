@@ -1,14 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FlatList } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { ListItem } from 'react-native-elements';
+import { ListItem, Text } from 'react-native-elements';
 import striptags from 'striptags';
+import truncate from 'truncate';
 import SafeArea from '../components/SafeArea';
 import ButtonSync from '../components/ButtonSync';
+import { Inset } from '../components/Spacing';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation: { navigate } }) => ({
@@ -27,12 +29,19 @@ class HomeScreen extends React.Component {
     } = this.props;
     const tasks = (allTasks || []).map(item => ({
       ...item,
-      description: striptags(item.description)
+      description: truncate(striptags(item.description), 140)
     }));
 
     return (
       <SafeArea>
         <ButtonSync />
+        {!tasks.length && (
+          <Inset all="large">
+            <Text>
+              There are no tasks assigned to you. Pull down to refresh.
+            </Text>
+          </Inset>
+        )}
         <FlatList
           data={tasks}
           keyExtractor={item => item.id}
@@ -41,7 +50,9 @@ class HomeScreen extends React.Component {
           renderItem={({ item }) => (
             <ListItem
               title={item.name}
+              titleStyle={styles.itemTitle}
               subtitle={item.description}
+              subtitleStyle={styles.itemDescription}
               onPress={() => navigate('Task', { task: item })}
               bottomDivider
               chevron
@@ -82,3 +93,13 @@ HomeScreen.propTypes = {
     refetch: PropTypes.func
   })
 };
+
+const styles = StyleSheet.create({
+  itemTitle: {
+    fontWeight: '600'
+  },
+  itemDescription: {
+    marginTop: 5,
+    color: '#777'
+  }
+});

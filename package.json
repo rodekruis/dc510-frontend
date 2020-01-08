@@ -34,6 +34,7 @@
     "react-navigation-header-buttons": "^3.0.4",
     "react-navigation-stack": "~1.10.3",
     "striptags": "^3.1.1",
+    "truncate": "~2.1.0",
     "uuid": "~3.3.3"
   },
   "devDependencies": {
