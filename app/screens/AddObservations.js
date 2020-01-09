@@ -7,10 +7,11 @@ import MapView, { Marker, Callout } from 'react-native-maps';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
+import * as FileSystem from 'expo-file-system';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import SafeArea from '../components/SafeArea';
 import SlideView from '../components/SlideView';
-import { spacing, baseMap } from '../constants';
+import { spacing, baseMap, IMAGES_DIR } from '../constants';
 import { Inset, Stack } from '../components/Spacing';
 import Images from '../components/Images';
 import { graphql } from 'react-apollo';
@@ -136,8 +137,16 @@ class AddObservationsScreen extends React.Component {
 
   unsetActiveMarker = () => this.setState({ activeMarker: null });
 
-  removeMarker = () => {
+  removeMarker = async () => {
     const { markers, activeMarker } = this.state;
+    // remove images if there are any
+    if (activeMarker.images.length) {
+      await Promise.all(
+        activeMarker.images.map(image =>
+          FileSystem.deleteAsync(IMAGES_DIR + '/' + image)
+        )
+      );
+    }
     this.setState({
       markers: markers.filter(m => m.key !== activeMarker.key),
       activeMarker: null
