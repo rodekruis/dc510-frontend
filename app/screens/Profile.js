@@ -24,6 +24,9 @@ class Profile extends React.Component {
   };
 
   logout = () => {
+    // @todo
+    // Check if there are any observations to be synced
+    // Ask the user if they want to sync before logging out
     Alert.alert(
       'Are you sure you want to logout?',
       'Logging out will erase all the data you have collected so far',

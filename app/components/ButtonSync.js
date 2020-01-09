@@ -20,18 +20,20 @@ class ButtonSync extends React.Component {
   };
 
   sync = async () => {
-    this.setState({ loading: true, error: null });
+    this.setState({ loading: true, error: null, uploading: true });
     try {
-      this.setState({ uploading: true });
+      // Uploads `images` from the FileSystem to the cloud.
+      // After upload, url of the image is returned which is stored in
+      // `images_urls`.
       await this.props.uploadImages();
       this.setState({ uploading: false });
 
-      // transform it into type `ObservationsCreateInput`
+      // transform it into type ObservationsCreateInput
       const observations = this.props.data.observations
         .map(o => ({
           ...o,
-          task: { connect: { id: o.task } }, // TaskRelateToOneInput
-          severity: { connect: { id: o.severity } }, // SeverityRelateToOneInput
+          task: { connect: { id: o.task } }, // type TaskRelateToOneInput
+          severity: { connect: { id: o.severity } }, // type SeverityRelateToOneInput
           image_urls: {
             create: o.image_urls.map(url => ({ url }))
           }
@@ -48,8 +50,8 @@ class ButtonSync extends React.Component {
     } catch (e) {
       console.log(e);
       this.setState({
-        error: 'Some error in syncing, let the developers know!',
-        loading: false
+        ...initialState,
+        error: 'Some error in syncing, let the developers know!'
       });
     }
   };
