@@ -24,7 +24,7 @@ export const baseMap = 'http://c.tile.openstreetmap.org';
 
 export const IMAGES_DIR = `${FileSystem.documentDirectory}images`;
 
-export const isDev = typeof __DEV__ !== 'undefined';
+export const isDev = __DEV__; // eslint-disable-line
 
 // Environments
 const env = {
