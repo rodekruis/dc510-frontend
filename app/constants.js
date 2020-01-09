@@ -23,3 +23,13 @@ export const fontSize = {
 export const baseMap = 'http://c.tile.openstreetmap.org';
 
 export const IMAGES_DIR = `${FileSystem.documentDirectory}images`;
+
+export const isDev = typeof __DEV__ !== 'undefined';
+
+// Environments
+const env = {
+  dev: 'http://localhost:3000',
+  staging: 'https://dc510-staging.herokuapp.com'
+};
+
+export const API_HOST = isDev ? env.dev : env.staging;

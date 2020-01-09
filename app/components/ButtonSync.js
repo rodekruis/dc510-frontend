@@ -10,7 +10,8 @@ import { GET_OBSERVATIONS } from '../resolvers';
 
 const initialState = {
   loading: false,
-  error: null
+  error: null,
+  uploading: false
 };
 
 class ButtonSync extends React.Component {
@@ -21,10 +22,9 @@ class ButtonSync extends React.Component {
   sync = async () => {
     this.setState({ loading: true, error: null });
     try {
-      // @todo
-      // - Upload images before syncing observations
-      // - Update local state after syncing
-      // - Add images via createMediaItem mutation
+      this.setState({ uploading: true });
+      await this.props.uploadImages();
+      this.setState({ uploading: false });
 
       // transform it into type `ObservationsCreateInput`
       const observations = this.props.data.observations
@@ -33,9 +33,7 @@ class ButtonSync extends React.Component {
           task: { connect: { id: o.task } }, // TaskRelateToOneInput
           severity: { connect: { id: o.severity } }, // SeverityRelateToOneInput
           image_urls: {
-            create: o.images.map(img => ({
-              url: `https://cloud.rodekruis.nl/${img}`
-            }))
+            create: o.image_urls.map(url => ({ url }))
           }
         }))
         .map(
@@ -58,7 +56,7 @@ class ButtonSync extends React.Component {
 
   render() {
     const { observations } = this.props.data;
-    const { error, loading } = this.state;
+    const { error, loading, uploading } = this.state;
     // @todo investigate
     // For some reason, observations evaluates to undefined when there's nothing
     // in the cache yet. From the documentation it looks like this should be
@@ -75,7 +73,11 @@ class ButtonSync extends React.Component {
             <Stack size="medium" />
           </View>
         )}
-        <Button title="Sync" loading={loading} onPress={this.sync} />
+        <Button
+          title="Sync"
+          loading={loading || uploading}
+          onPress={this.sync}
+        />
         <Stack size="medium" />
         <Text>You have {count} observations to sync</Text>
       </Inset>
@@ -85,7 +87,8 @@ class ButtonSync extends React.Component {
 
 ButtonSync.propTypes = {
   data: PropTypes.object,
-  createObservations: PropTypes.func
+  createObservations: PropTypes.func,
+  uploadImages: PropTypes.func
 };
 
 const CREATE_OBSERVATIONS = gql`
@@ -99,8 +102,17 @@ const CREATE_OBSERVATIONS = gql`
   }
 `;
 
+const UPLOAD_IMAGES = gql`
+  mutation {
+    uploadImages @client
+  }
+`;
+
 export default compose(
   graphql(GET_OBSERVATIONS),
+  graphql(UPLOAD_IMAGES, {
+    name: 'uploadImages'
+  }),
   graphql(CREATE_OBSERVATIONS, {
     name: 'createObservations',
     options: {

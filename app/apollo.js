@@ -2,18 +2,13 @@ import { AsyncStorage } from 'react-native';
 import ApolloClient, { InMemoryCache } from 'apollo-boost';
 import { CachePersistor } from 'apollo-cache-persist';
 import resolvers, { initialState, AUTHENTICATED_USER } from './resolvers';
+import { isDev, API_HOST } from './constants';
+
+const API_ENDPOINT = API_HOST + '/admin/api';
 
 // Support schema migrations https://git.io/Je58A
 const SCHEMA_VERSION = '1'; // Must be a string.
 const SCHEMA_VERSION_KEY = 'apollo-schema-version';
-
-// Environments
-const env = {
-  dev: 'http://localhost:3000/admin/api',
-  staging: 'https://dc510-staging.herokuapp.com/admin/api'
-};
-const isDev =  __DEV__; // eslint-disable-line
-const API_ENDPOINT = isDev ? env.dev : env.staging;
 
 // Apollo config
 const cache = new InMemoryCache();
