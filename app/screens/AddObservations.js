@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, Dimensions, Alert, Platform } from 'react-native';
 import { Button, Text } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
-import MapView, { Marker, Callout } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
@@ -215,6 +215,7 @@ class AddObservationsScreen extends React.Component {
             mapType={Platform.OS == 'android' ? 'none' : 'standard'}
             showsUserLocation
             onPress={this.onMapPress}
+            minZoomLevel={10}
             style={styles.mapStyle}>
             <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} />
             {markers.map(marker => (
@@ -230,20 +231,9 @@ class AddObservationsScreen extends React.Component {
                 centerOffset={{ x: 0, y: -16 }} // ios
                 anchor={{ x: 0.5, y: 1 }} // android
                 draggable
-                onDragEnd={this.onMarkerDragEnd(marker.key)}>
-                <Callout onPress={this.openMenu(marker)}>
-                  <Inset all="tiny">
-                    <Text>Marker {marker.key}</Text>
-                    {marker.images.length > 0 && (
-                      <Text>{marker.images.length} image(s)</Text>
-                    )}
-                  </Inset>
-                  {/* @todo
-                    unfortunately onPress event on any child elements
-                    don't get fired, find a solution
-                    https://github.com/react-native-community/react-native-maps/issues/987 */}
-                </Callout>
-              </Marker>
+                onPress={this.openMenu(marker)}
+                onDragEnd={this.onMarkerDragEnd(marker.key)}
+              />
             ))}
           </MapView>
           <View style={styles.buttonContainer}>

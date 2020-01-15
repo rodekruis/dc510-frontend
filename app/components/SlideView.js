@@ -3,7 +3,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View, Animated, Dimensions } from 'react-native';
+import { View, Animated, Dimensions, StyleSheet } from 'react-native';
 
 class SlideView extends Component {
   constructor(props) {
@@ -92,29 +92,17 @@ class SlideView extends Component {
   }
 
   render() {
-    const absolute = {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      bottom: 0,
-      right: 0
-    };
-
-    const containerStyle = {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      opacity: this.state.opacity
-    };
-
-    if (this.state.renderComponent) {
-      return (
-        <Animated.ScrollView style={[absolute, containerStyle]}>
-          {this.props.children}
-        </Animated.ScrollView>
-      );
-    } else {
-      return <View />;
-    }
+    if (!this.state.renderComponent) return <View />;
+    return (
+      <Animated.ScrollView
+        style={[
+          styles.absolute,
+          styles.container,
+          { opacity: this.state.opacity }
+        ]}>
+        {this.props.children}
+      </Animated.ScrollView>
+    );
   }
 }
 
@@ -140,3 +128,17 @@ SlideView.defaultProps = {
 };
 
 export default SlideView;
+
+const styles = StyleSheet.create({
+  absolute: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0
+  },
+  container: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)'
+  }
+});
