@@ -25,7 +25,7 @@ class HomeScreen extends React.Component {
   render() {
     const {
       navigation: { navigate },
-      data: { loading, allTasks, refetch }
+      data: { allTasks, refetch }
     } = this.props;
     const tasks = (allTasks || []).map(item => ({
       ...item,
@@ -46,7 +46,7 @@ class HomeScreen extends React.Component {
           data={tasks}
           keyExtractor={item => item.id}
           onRefresh={refetch}
-          refreshing={loading}
+          refreshing={false}
           renderItem={({ item }) => (
             <ListItem
               title={item.name}
