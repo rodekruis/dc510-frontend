@@ -228,7 +228,7 @@ class AddObservationsScreen extends React.Component {
                 stopPropagation
                 image={SEVERITY_ICON[marker.severity]}
                 centerOffset={{ x: 0, y: -16 }} // ios
-                anchor={{ x: 0, y: -16 }} // android
+                anchor={{ x: 0.5, y: 1 }} // android
                 draggable
                 onDragEnd={this.onMarkerDragEnd(marker.key)}>
                 <Callout onPress={this.openMenu(marker)}>

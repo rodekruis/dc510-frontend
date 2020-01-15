@@ -3,12 +3,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Animated,
-  Dimensions,
-  TouchableWithoutFeedback
-} from 'react-native';
+import { View, Animated, Dimensions } from 'react-native';
 
 class SlideView extends Component {
   constructor(props) {
@@ -111,26 +106,10 @@ class SlideView extends Component {
       opacity: this.state.opacity
     };
 
-    const sliderStyle = {
-      height: this.props.expandedHeight,
-      backgroundColor: 'transparent',
-      opacity: this.state.opacity,
-      position: 'absolute',
-      top: this.state.position,
-      left: 0,
-      right: 0,
-      bottom: null
-    };
-
     if (this.state.renderComponent) {
       return (
         <Animated.ScrollView style={[absolute, containerStyle]}>
-          <TouchableWithoutFeedback onPress={this.tapped}>
-            <Animated.ScrollView
-              style={[absolute, sliderStyle, this.props.style]}>
-              {this.props.children}
-            </Animated.ScrollView>
-          </TouchableWithoutFeedback>
+          {this.props.children}
         </Animated.ScrollView>
       );
     } else {
