@@ -29,7 +29,7 @@ class HomeScreen extends React.Component {
     } = this.props;
     const tasks = (allTasks || []).map(item => ({
       ...item,
-      description: truncate(striptags(item.description), 140)
+      description: truncate(striptags(item.description), 80)
     }));
 
     return (
