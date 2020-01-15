@@ -215,7 +215,7 @@ class AddObservationsScreen extends React.Component {
             mapType={Platform.OS == 'android' ? 'none' : 'standard'}
             showsUserLocation
             onPress={this.onMapPress}
-            minZoomLevel={10}
+            // minZoomLevel={10} @todo enable this once we add initialRegion
             style={styles.mapStyle}>
             <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} />
             {markers.map(marker => (
