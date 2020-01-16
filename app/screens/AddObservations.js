@@ -16,6 +16,7 @@ import SlideView from '../components/SlideView';
 import { spacing, IMAGES_DIR } from '../constants';
 import { Inset, Stack } from '../components/Spacing';
 import Images from '../components/Images';
+import theme from '../theme';
 
 // @todo get this from api
 const SEVERITIES = ['None', 'Mild', 'High', 'Severe'];
@@ -90,7 +91,8 @@ class AddObservationsScreen extends React.Component {
     if (status !== 'granted') {
       // @todo display this message to the user
       this.setState({
-        errorMessage: 'Permission to access location was denied'
+        errorMessage:
+          'Permission to access location was denied. Please go to your phone settings and give permission in order to add observations.'
       });
     }
   }
@@ -229,7 +231,7 @@ class AddObservationsScreen extends React.Component {
   };
 
   render() {
-    const { markers, activeMarker } = this.state;
+    const { markers, activeMarker, errorMessage } = this.state;
 
     // Disable finish button until all severities are set
     const cannotFinish = markers.map(m => m.severity).includes(1);
@@ -237,6 +239,7 @@ class AddObservationsScreen extends React.Component {
     return (
       <SafeArea>
         <View style={styles.container}>
+          {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
           <MapView
             mapType={Platform.OS == 'android' ? 'none' : 'standard'}
             showsUserLocation
@@ -337,6 +340,16 @@ const styles = StyleSheet.create({
   },
   mapStyle: {
     ...StyleSheet.absoluteFillObject
+  },
+  error: {
+    justifyContent: 'flex-start',
+    backgroundColor: theme.colors.error,
+    zIndex: 1,
+    width,
+    top: 0,
+    position: 'absolute',
+    padding: spacing.medium,
+    color: 'white'
   },
   buttonContainer: buttonContainerStyle,
   severityText: {

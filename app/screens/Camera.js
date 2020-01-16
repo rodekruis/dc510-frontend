@@ -9,7 +9,7 @@ import uuidv4 from 'uuid/v4';
 import { buttonContainerStyle } from './AddObservations';
 import Images from '../components/Images';
 import SafeArea from '../components/SafeArea';
-import { Stack } from '../components/Spacing';
+import { Stack, Inset } from '../components/Spacing';
 import { IMAGES_DIR, spacing } from '../constants';
 
 class Camera extends React.Component {
@@ -56,12 +56,12 @@ class Camera extends React.Component {
 
     if (!hasPermission) {
       return (
-        <View>
+        <Inset all="medium">
           <Text>
-            No permission to open camera. Please go to settings and grant
-            access.
+            Permission to access camera was denied. Please go to your phone
+            settings and give permission in order to add photos to observations.
           </Text>
-        </View>
+        </Inset>
       );
     } else if (!isFocused) return null;
 
