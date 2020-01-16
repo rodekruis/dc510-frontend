@@ -7,6 +7,7 @@ import { gql } from 'apollo-boost';
 import compose from 'lodash.flowright';
 import { Inset, Stack } from './Spacing';
 import { GET_OBSERVATIONS } from '../resolvers';
+import theme from '../theme';
 
 const initialState = {
   loading: false,
@@ -76,12 +77,11 @@ class ButtonSync extends React.Component {
           </View>
         )}
         <Button
-          title="Sync"
+          title={`Sync (${count})`}
           loading={loading || uploading}
+          disabled={loading || uploading}
           onPress={this.sync}
         />
-        <Stack size="medium" />
-        <Text>You have {count} observations to sync</Text>
       </Inset>
     );
   }
@@ -131,6 +131,6 @@ export default compose(
 
 const styles = StyleSheet.create({
   error: {
-    color: 'red'
+    color: theme.colors.warning
   }
 });

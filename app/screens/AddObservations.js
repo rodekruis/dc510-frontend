@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, Dimensions, Alert, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, Alert, BackHandler } from 'react-native';
 import { Button, Text } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
 import MapView, { Marker } from 'react-native-maps';
@@ -42,6 +42,21 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const MIN_ZOOM_LEVEL = 13;
 const MAX_ZOOM_LEVEL = 20;
 
+function Confirm(callback) {
+  return Alert.alert(
+    'Are you sure you want to cancel?',
+    'Cancelling will discard any observations you have made so far',
+    [
+      {
+        text: 'No',
+        style: 'cancel'
+      },
+      { text: 'Yes', onPress: () => callback() }
+    ],
+    { cancelable: false }
+  );
+}
+
 class AddObservationsScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -50,30 +65,15 @@ class AddObservationsScreen extends React.Component {
 
   static navigationOptions = ({
     navigation: {
-      popToTop,
+      goBack,
       state: { params }
     }
   }) => ({
     title: params.task.name,
+    headerLeft: null,
     headerRight: (
       <HeaderButtons>
-        <Item
-          title="Cancel"
-          onPress={() =>
-            Alert.alert(
-              'Are you sure you want to cancel?',
-              'Cancelling will discard any observations you have made so far',
-              [
-                {
-                  text: 'No',
-                  style: 'cancel'
-                },
-                { text: 'Yes', onPress: () => popToTop() }
-              ],
-              { cancelable: false }
-            )
-          }
-        />
+        <Item title="Cancel" onPress={() => Confirm(goBack)} />
       </HeaderButtons>
     )
   });
@@ -87,15 +87,24 @@ class AddObservationsScreen extends React.Component {
 
   // get permission for location
   async componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     const { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
-      // @todo display this message to the user
       this.setState({
         errorMessage:
           'Permission to access location was denied. Please go to your phone settings and give permission in order to add observations.'
       });
     }
   }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+  }
+
+  handleBackButton = () => {
+    Confirm(this.props.navigation.goBack);
+    return true;
+  };
 
   getCurrentLocation = async () => {
     const { coords } = await Location.getCurrentPositionAsync({});
@@ -196,7 +205,7 @@ class AddObservationsScreen extends React.Component {
   };
 
   // @todo
-  // add a way to remove images
+  // add a way to remove each image individually
   addPhotos = () => {
     const {
       navigate,
@@ -241,7 +250,7 @@ class AddObservationsScreen extends React.Component {
         <View style={styles.container}>
           {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
           <MapView
-            mapType={Platform.OS == 'android' ? 'none' : 'standard'}
+            // mapType={Platform.OS == 'android' ? 'none' : 'standard'}
             showsUserLocation
             ref={this.map}
             onPress={this.onMapPress}
