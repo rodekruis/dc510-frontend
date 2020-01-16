@@ -49,7 +49,7 @@ class HomeScreen extends React.Component {
           refreshing={false}
           renderItem={({ item }) => (
             <ListItem
-              title={item.name}
+              title={truncate(item.name, 35)}
               titleStyle={styles.itemTitle}
               subtitle={truncate(striptags(item.description), 80)}
               subtitleStyle={styles.itemDescription}
