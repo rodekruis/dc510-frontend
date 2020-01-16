@@ -9,13 +9,13 @@ import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import * as FileSystem from 'expo-file-system';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
+import { graphql } from 'react-apollo';
+import { gql } from 'apollo-boost';
 import SafeArea from '../components/SafeArea';
 import SlideView from '../components/SlideView';
 import { spacing, baseMap, IMAGES_DIR } from '../constants';
 import { Inset, Stack } from '../components/Spacing';
 import Images from '../components/Images';
-import { graphql } from 'react-apollo';
-import { gql } from 'apollo-boost';
 
 // @todo get this from api
 const SEVERITIES = ['None', 'Mild', 'High', 'Severe'];
@@ -31,7 +31,22 @@ const SEVERITY_ICON = {
 // If offline, load from FileSystem
 const urlTemplate = `${baseMap}/{z}/{x}/{y}.png`;
 
+// We use delta's instead of zoom levels for the map
+// https://github.com/react-native-community/react-native-maps/blob/master/example/examples/DisplayLatLng.js#L12-L18
+const { width, height } = Dimensions.get('window');
+const ASPECT_RATIO = width / height;
+const LATITUDE_DELTA = 0.0922; // don't really know how this came to be!
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+const MIN_ZOOM_LEVEL = 13;
+const MAX_ZOOM_LEVEL = 20;
+
 class AddObservationsScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.map = React.createRef();
+  }
+
   static navigationOptions = ({
     navigation: {
       popToTop,
@@ -77,9 +92,6 @@ class AddObservationsScreen extends React.Component {
       this.setState({
         errorMessage: 'Permission to access location was denied'
       });
-    } else {
-      const location = await this.getCurrentLocation();
-      this.setState({ location });
     }
   }
 
@@ -203,8 +215,22 @@ class AddObservationsScreen extends React.Component {
     popToTop(); // navigate back
   };
 
+  onLayout = async () => {
+    const location = await this.getCurrentLocation();
+    this.map.current.animateToRegion({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      longitudeDelta: LONGITUDE_DELTA,
+      latitudeDelta: LATITUDE_DELTA
+    });
+    // zoom level workaround
+    // https://github.com/react-native-community/react-native-maps/issues/2400
+    this.setState({ location, minZoomLevel: MIN_ZOOM_LEVEL });
+  };
+
   render() {
     const { markers, activeMarker } = this.state;
+
     // Disable finish button until all severities are set
     const cannotFinish = markers.map(m => m.severity).includes(1);
 
@@ -214,8 +240,11 @@ class AddObservationsScreen extends React.Component {
           <MapView
             mapType={Platform.OS == 'android' ? 'none' : 'standard'}
             showsUserLocation
+            ref={this.map}
             onPress={this.onMapPress}
-            // minZoomLevel={10} @todo enable this once we add initialRegion
+            minZoomLevel={this.state.minZoomLevel}
+            maxZoomLevel={MAX_ZOOM_LEVEL}
+            onLayout={this.onLayout}
             style={styles.mapStyle}>
             <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} />
             {markers.map(marker => (
@@ -298,7 +327,7 @@ export const buttonContainerStyle = {
   marginVertical: spacing.massive,
   paddingLeft: spacing.massive,
   paddingRight: spacing.massive,
-  width: Dimensions.get('window').width
+  width
 };
 
 const styles = StyleSheet.create({
