@@ -20,8 +20,6 @@ export const fontSize = {
   xlarge: 24
 };
 
-export const baseMap = 'http://c.tile.openstreetmap.org';
-
 export const IMAGES_DIR = `${FileSystem.documentDirectory}images`;
 
 export const isDev = __DEV__; // eslint-disable-line

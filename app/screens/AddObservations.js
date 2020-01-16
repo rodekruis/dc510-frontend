@@ -13,7 +13,7 @@ import { graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import SafeArea from '../components/SafeArea';
 import SlideView from '../components/SlideView';
-import { spacing, baseMap, IMAGES_DIR } from '../constants';
+import { spacing, IMAGES_DIR } from '../constants';
 import { Inset, Stack } from '../components/Spacing';
 import Images from '../components/Images';
 
@@ -29,7 +29,7 @@ const SEVERITY_ICON = {
 
 // @todo
 // If offline, load from FileSystem
-const urlTemplate = `${baseMap}/{z}/{x}/{y}.png`;
+// const urlTemplate = `${baseMap}/{z}/{x}/{y}.png`;
 
 // We use delta's instead of zoom levels for the map
 // https://github.com/react-native-community/react-native-maps/blob/master/example/examples/DisplayLatLng.js#L12-L18
@@ -246,7 +246,6 @@ class AddObservationsScreen extends React.Component {
             maxZoomLevel={MAX_ZOOM_LEVEL}
             onLayout={this.onLayout}
             style={styles.mapStyle}>
-            <MapView.UrlTile urlTemplate={urlTemplate} zIndex={1} />
             {markers.map(marker => (
               <Marker
                 title={`Marker ${marker.key}`}
