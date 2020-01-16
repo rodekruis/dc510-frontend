@@ -29,7 +29,7 @@ class HomeScreen extends React.Component {
     } = this.props;
     const tasks = (allTasks || []).map(item => ({
       ...item,
-      description: truncate(striptags(item.description), 80)
+      description: striptags(item.description)
     }));
 
     return (
@@ -51,7 +51,7 @@ class HomeScreen extends React.Component {
             <ListItem
               title={item.name}
               titleStyle={styles.itemTitle}
-              subtitle={item.description}
+              subtitle={truncate(striptags(item.description), 80)}
               subtitleStyle={styles.itemDescription}
               onPress={() => navigate('Task', { task: item })}
               bottomDivider
@@ -73,6 +73,12 @@ const GET_ASSIGNED_TASKS = gql`
       id
       name
       description
+      completed
+      createdAt
+      updatedAt
+      createdBy {
+        name
+      }
     }
   }
 `;
