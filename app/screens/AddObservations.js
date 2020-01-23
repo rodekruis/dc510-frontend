@@ -17,6 +17,7 @@ import { spacing, IMAGES_DIR } from '../constants';
 import { Inset, Stack } from '../components/Spacing';
 import Images from '../components/Images';
 import theme from '../theme';
+import { mbtiles } from './Task';
 
 // @todo get this from api
 const SEVERITIES = ['None', 'Mild', 'High', 'Severe'];
@@ -241,6 +242,7 @@ class AddObservationsScreen extends React.Component {
 
   render() {
     const { markers, activeMarker, errorMessage } = this.state;
+    const { task } = this.props.navigation.state.params;
 
     // Disable finish button until all severities are set
     const cannotFinish = markers.map(m => m.severity).includes(1);
@@ -258,6 +260,7 @@ class AddObservationsScreen extends React.Component {
             maxZoomLevel={MAX_ZOOM_LEVEL}
             onLayout={this.onLayout}
             style={styles.mapStyle}>
+            <MapView.MbTile pathTemplate={mbtiles(task)} />
             {markers.map(marker => (
               <Marker
                 title={`Marker ${marker.key}`}
