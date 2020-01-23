@@ -36,11 +36,8 @@ class TaskScreen extends React.Component {
       });
     };
 
-    task.downloadUrl =
-      'https://dl.dropboxusercontent.com/s/486b1bi3evsk5kh/zh2.mbtiles?dl=0';
-
     const downloadResumable = FileSystem.createDownloadResumable(
-      task.downloadUrl,
+      task.mbtilesUrl,
       mbtiles(task),
       {},
       callback
@@ -95,7 +92,7 @@ class TaskScreen extends React.Component {
             <Stack size="large" />
             <Text>{task.description}</Text>
             <Stack size="large" />
-            {!downloaded && (
+            {task.mbtilesUrl.length > 0 && !downloaded && (
               <Button
                 type="outline"
                 onPress={this.downloadMap(task)}
@@ -117,7 +114,7 @@ class TaskScreen extends React.Component {
             <Button
               title="Add Observations"
               type="solid"
-              disabled={task.downloadUrl && !hasDownload}
+              disabled={task.mbtilesUrl.length > 0 && !downloaded}
               onPress={() => navigate('AddObservations', { task })}
             />
           </Inset>

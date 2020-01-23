@@ -73,6 +73,7 @@ const GET_ASSIGNED_TASKS = gql`
       id
       name
       description
+      mbtilesUrl
       completed
       createdAt
       updatedAt

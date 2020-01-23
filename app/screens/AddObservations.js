@@ -260,7 +260,9 @@ class AddObservationsScreen extends React.Component {
             maxZoomLevel={MAX_ZOOM_LEVEL}
             onLayout={this.onLayout}
             style={styles.mapStyle}>
-            <MapView.MbTile pathTemplate={mbtiles(task)} />
+            {task.mbtilesUrl.length > 0 && (
+              <MapView.MbTile pathTemplate={mbtiles(task)} />
+            )}
             {markers.map(marker => (
               <Marker
                 title={`Marker ${marker.key}`}
