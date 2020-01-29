@@ -50,6 +50,9 @@
       "iosExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/ios-v2.14.3-sdk36.0.0-00f587c0-b8c9-4b6b-88f6-2ccd4f20dc9c.tar.gz",
       "androidExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/android-v2.14.0-sdk36.0.0-fb8689e6-fd42-4b18-b01f-ac2ef3bc8681.tar.gz"
     },
-    "scheme": "exp8e215511524744189ce38763b3f67166"
-  }
+    "scheme": "exp8e215511524744189ce38763b3f67166",
+    "entryPoint": "node_modules/expo/AppEntry.js"
+  },
+  "displayName": "510 Data collect",
+  "name": "510dc"
 }

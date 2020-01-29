@@ -1,6 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet, Dimensions, Alert, BackHandler } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Alert,
+  BackHandler,
+  Platform
+} from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import { Button, Text } from 'react-native-elements';
 import { withNavigation } from 'react-navigation';
 import MapView, { Marker } from 'react-native-maps';
@@ -40,7 +48,7 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.0922; // don't really know how this came to be!
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-const MIN_ZOOM_LEVEL = 13;
+const MIN_ZOOM_LEVEL = 5;
 const MAX_ZOOM_LEVEL = 20;
 
 function Confirm(callback) {
@@ -83,7 +91,8 @@ class AddObservationsScreen extends React.Component {
     location: null,
     errorMessage: null,
     markers: [],
-    activeMarker: null
+    activeMarker: null,
+    offline: false
   };
 
   // get permission for location
@@ -96,11 +105,18 @@ class AddObservationsScreen extends React.Component {
           'Permission to access location was denied. Please go to your phone settings and give permission in order to add observations.'
       });
     }
+    this.unbsubscribeNetInfo = NetInfo.addEventListener(this.isOffline);
   }
 
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    this.unbsubscribeNetInfo();
   }
+
+  isOffline = ({ type }) => {
+    console.log('is offline', type);
+    this.setState({ offline: type === 'none' });
+  };
 
   handleBackButton = () => {
     Confirm(this.props.navigation.goBack);
@@ -241,7 +257,7 @@ class AddObservationsScreen extends React.Component {
   };
 
   render() {
-    const { markers, activeMarker, errorMessage } = this.state;
+    const { markers, activeMarker, errorMessage, offline } = this.state;
     const { task } = this.props.navigation.state.params;
 
     // Disable finish button until all severities are set
@@ -252,7 +268,7 @@ class AddObservationsScreen extends React.Component {
         <View style={styles.container}>
           {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
           <MapView
-            // mapType={Platform.OS == 'android' ? 'none' : 'standard'}
+            mapType={Platform.OS === 'android' && offline ? 'none' : 'standard'}
             showsUserLocation
             ref={this.map}
             onPress={this.onMapPress}
@@ -260,8 +276,11 @@ class AddObservationsScreen extends React.Component {
             maxZoomLevel={MAX_ZOOM_LEVEL}
             onLayout={this.onLayout}
             style={styles.mapStyle}>
-            {task.mbtilesUrl.length > 0 && (
-              <MapView.MbTile pathTemplate={mbtiles(task)} />
+            {task.mbtilesUrl.length > 0 && offline && (
+              <MapView.MbTile
+                pathTemplate={mbtiles(task).replace('file://', '')}
+                tileSize={256}
+              />
             )}
             {markers.map(marker => (
               <Marker
