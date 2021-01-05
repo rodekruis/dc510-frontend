@@ -11,7 +11,7 @@
     "@expo/vector-icons": "^10.0.6",
     "apollo-boost": "~0.4.7",
     "apollo-cache-persist": "^0.1.1",
-    "axios": "~0.19.1",
+    "axios": "~0.21.1",
     "expo": "~36.0.0",
     "expo-camera": "~8.0.0",
     "expo-file-system": "~8.0.0",
